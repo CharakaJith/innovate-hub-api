@@ -25,8 +25,7 @@ const sequelize = new Sequelize(
         idle: 10000,
       },
     }
-);
-  
+);  
 sequelize
     .authenticate()
     .then(() => {
@@ -38,6 +37,13 @@ sequelize
         process.exit();
     });
 
+// Import routs
+const user = require('./routes/user.routes');
+
+// Setup routing paths
+app.use('/api/user', user);
+
+// Start server 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`PORT: ${PORT} | MODE: ${env}`);

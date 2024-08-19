@@ -4,8 +4,12 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev": "env-cmd -f .env.local nodemon app.js",
-    "prod": "env-cmd -f .env.production node app.js",
+    "dev": "env-cmd -f .env.dev nodemon app.js",
+    "migrate:up": "env-cmd -f .env.dev npx sequelize-cli db:migrate",
+    "migrate:down": "env-cmd -f .env.dev npx sequelize-cli db:migrate:undo",
+    "migrate:down:all": "env-cmd -f .env.dev npx sequelize-cli db:migrate:undo:all",
+    "seed:up:all": "env-cmd -f .env.dev npx sequelize-cli db:seed:all",
+    "seed:down:all": "env-cmd -f .env.dev npx sequelize-cli db:seed:undo",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,12 +23,14 @@
   },
   "homepage": "https://github.com/CharakaJith/innovate-hub-api#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "env-cmd": "^10.1.0",
     "express": "^4.19.2",
     "pg": "^8.12.0",
     "sequelize": "^6.37.3",
+    "sequelize-cli": "^6.6.2",
     "winston": "^3.14.2",
     "winston-daily-rotate-file": "^5.0.0"
   },
