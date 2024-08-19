@@ -1,0 +1,30 @@
+{
+  "name": "innovate-hub-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "env-cmd -f .env.local nodemon app.js",
+    "prod": "env-cmd -f .env.production node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CharakaJith/innovate-hub-api.git"
+  },
+  "author": "jith",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CharakaJith/innovate-hub-api/issues"
+  },
+  "homepage": "https://github.com/CharakaJith/innovate-hub-api#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "env-cmd": "^10.1.0",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
