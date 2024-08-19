@@ -9,7 +9,7 @@ module.exports = {
     // hash password
     const encryptedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
 
-    return queryInterface.bulkInsert('users', [{
+    return queryInterface.bulkInsert('user', [{
       userName: process.env.ADMIN_NAME,
       userEmail: process.env.ADMIN_EMAIL,
       userPassword: encryptedPassword,
