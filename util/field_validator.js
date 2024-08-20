@@ -1,3 +1,5 @@
+const { USER_ROLE, USER_TEAM } = require('../enum/user');
+
 const field_validator = {
     check_empty_string: async (field, param, fieldName) => {
         if (!field || field.trim().length === 0) {
@@ -24,6 +26,32 @@ const field_validator = {
   
         return 1;
     },
+
+    check_role: async (role, param) => {
+      const isValidRole = await field_validator.check_empty_string(role, param, 'User role');
+
+      if (isValidRole != 1 || !Object.values(USER_ROLE).includes(role)) {
+        return {
+          field: param,
+          message: `Invalid user role!`,
+        }
+      }
+
+      return 1;
+    },
+
+    check_team: async (team, param) => {
+      const isValidTeam = await field_validator.check_empty_string(team, param, 'User team');
+
+      if (isValidTeam != 1 || !Object.values(USER_TEAM).includes(team)) {
+        return {
+          field: param,
+          message: `Invalid user team!`,
+        }
+      }
+
+      return 1;
+    }
 };
 
 module.exports = field_validator;

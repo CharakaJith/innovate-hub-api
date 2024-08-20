@@ -7,9 +7,8 @@ const authenticate = async (req, res, next) => {
         if (req.path == '/api/user/login') {
             next();
         } else {
-            console.log(req.path);
             const token = req.headers.authorization;
-
+            
             const decode = jwt.verify(JSON.parse(token), process.env.JWT_SECRET);
             req.user = decode.tokenUser;
 
