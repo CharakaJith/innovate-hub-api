@@ -1,7 +1,7 @@
 'use strict';
 const dotenv = require('dotenv').config();
 const bcrypt = require('bcrypt');
-const { USER_ROLE } = require('../enum/role');
+const { USER_ROLE } = require('../enum/user');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {

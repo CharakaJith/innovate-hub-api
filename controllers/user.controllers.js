@@ -3,6 +3,7 @@ const logger = require('../middleware/logger/logger');
 const field_validator = require('../util/fieldValidator');
 const jwt_service = require('../util/jwtService');
 const UserService = require('../services/user.services');
+const { LOG_TYPE } = require('../enum/log');
 
 const UserController = {
     userLogin: async (req, res) => {
@@ -53,16 +54,16 @@ const UserController = {
             };
             const accessToken = await jwt_service.generate_access_token(tokenUser);
 
-            logger('info', true, 200, `User ${user.id} | ${user.userEmail} logged in!`, req)            
+            logger(LOG_TYPE.INFO, true, 200, `User ${user.id} | ${user.userEmail} logged in!`, req)            
             res.set({
                 'Access-Token': accessToken,
             });
             return res.status(200).json({
                 success: true,
-                message: 'ok'
+                message: 'Login successful!',
             });
         } catch (error) {
-            logger('error', false, 500, error.message, req);
+            logger(LOG_TYPE.ERROR, false, 500, error.message, req);
 
             return res.status(500).json({
                 success: false,

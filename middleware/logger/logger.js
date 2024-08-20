@@ -1,4 +1,5 @@
 const loggerIndex = require('./index');
+const { LOG_TYPE }= require('../../enum/log');
 
 const logger = (logType, resStatus, statusCode, message, req = {}, stack) => {
     const logBody = {
@@ -23,9 +24,9 @@ const logger = (logType, resStatus, statusCode, message, req = {}, stack) => {
 
     const logString = JSON.stringify(logBody).split('\n');
 
-    if (logType === 'info') {
+    if (logType === LOG_TYPE.INFO) {
         loggerIndex.info(logString);
-    } else if (logType === 'debug') {
+    } else if (logType === LOG_TYPE.DEBUG) {
         loggerIndex.debug(logString);
     } else {
         loggerIndex.error(logString);
