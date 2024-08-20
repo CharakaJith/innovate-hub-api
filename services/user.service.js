@@ -38,6 +38,24 @@ const UserService = {
     },
 
     /**
+     * Function to fetch a record from table "user" by coulmn 'userAdminId'
+     * 
+     * @param {Integer} adminId: id of the admin user belongs to 
+     * @returns an array of user detail objects if exists, else an empty array
+     */
+    findUsersByAdminId: async (adminId) => {
+        try {
+            return await models.User.findAll({
+                where: {
+                    userAdminId: adminId,
+                },
+            });
+        } catch (error) {
+            throw new Error(`Internal server error while fetching the user by admin id: ${error.message}`);
+        }
+    },
+
+    /**
      * Function to create a new record in table "user"
      * 
      * @param {Objects} userDetails: user details object 
