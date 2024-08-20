@@ -115,6 +115,7 @@ const UserController = {
                 userEmail: email,
                 userRole: role,
                 userTeam: team,
+                userAdminId: req.user.role == USER_ROLE.SUPER_ADMIN ? req.user.id : req.user.adminId,
                 isActive: false,
             };
             const newUser = await UserService.createNewUser(userDetails);
@@ -126,6 +127,67 @@ const UserController = {
             return res.status(200).json({
                 success: true,
                 message: 'User invited!',
+            });
+        } catch (error) {
+            logger(LOG_TYPE.ERROR, false, 500, error.message, req);
+
+            return res.status(500).json({
+                success: false,
+                error: error.message,
+            });
+        }
+    },
+
+    registerUser: async (req, res) => {
+        try {
+            const { id, email, password } = req.body;
+
+            // validate user inputs
+            const errorArray = [];  
+            errorArray.push(await field_validator.check_empty_number(id, 'id', 'User id')); 
+            errorArray.push(await field_validator.check_email(email, 'email'));
+            errorArray.push(await field_validator.check_empty_string(password, 'password', 'User password'));
+
+            // check inputs
+            const filteredErrors = errorArray.filter(obj => obj !== 1);
+            if (filteredErrors.length !== 0) {
+                logger('error', false, 500, filteredErrors, req);
+
+                return res.status(400).json({
+                    success: false,
+                    error: filteredErrors,
+                });
+            } 
+
+            // check if email exists
+            const user = await UserService.findUserById(id);
+            if (!user) {
+                throw new Error('Invalid user id!');
+            }
+
+            // validate user
+            if (user.userEmail != email) {
+                throw new Error('Permission denied!');
+            }
+            if (user.isActive) {
+                throw new Error(`User ${email} is already registered!`);
+            }
+
+            // hash password
+            const encryptedPassword = await bcrypt.hash(password, 10);
+
+            // update user 
+            const userDetails = {
+                id: id,
+                userPassword: encryptedPassword,
+                isActive: true,
+            };
+            const updatedUser = await UserService.updateUserById(userDetails);
+
+            logger(LOG_TYPE.INFO, true, 200, `User ${updatedUser[1][0].dataValues.id} | ${updatedUser[1][0].dataValues.userEmail} is registered!`, req)
+            return res.status(200).json({
+                success: true,
+                message: 'User registered!',
             });
         } catch (error) {
             logger(LOG_TYPE.ERROR, false, 500, error.message, req);

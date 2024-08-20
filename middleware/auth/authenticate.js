@@ -6,7 +6,8 @@ const authenticate = async (req, res, next) => {
     try {
         const unAuthPaths = [
             '/api/admin',
-            '/api/user/login'
+            '/api/user/login',
+            '/api/user/register'
         ];
 
         if (unAuthPaths.includes(req.path)) {

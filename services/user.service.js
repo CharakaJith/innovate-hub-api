@@ -20,6 +20,24 @@ const UserService = {
     },
 
     /**
+     * Function to fetch a record from table "user" by coulmn 'id'
+     * 
+     * @param {Integer} id: id of the user 
+     * @returns an object of user details if exists, else null
+     */
+    findUserById: async (id) => {
+        try {
+            return await models.User.findOne({
+                where: {
+                    id: id,
+                },
+            });
+        } catch (error) {
+            throw new Error(`Internal server error while fetching the user by id: ${error.message}`);
+        }
+    },
+
+    /**
      * Function to create a new record in table "user"
      * 
      * @param {Objects} userDetails: user details object 
@@ -30,6 +48,25 @@ const UserService = {
             return await models.User.create(userDetails);
         } catch (error) {
             throw new Error(`Internal server error while creating a new user: ${error.message}`);
+        }
+    },
+
+    /**
+     * Function to update an existing record in table "user"
+     * 
+     * @param {Object} userDetails: user details object  
+     * @returns 
+     */
+    updateUserById: async (userDetails) => {
+        try {
+            return await models.User.update(userDetails, {
+                where: {
+                    id: userDetails.id
+                },
+                returning: true
+            });
+        } catch (error) {
+            throw new Error(`Internal server error while updating user by id: ${error.message}`);
         }
     }
 };

@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const logger = require('./middleware/logger/logger');
-const auth = require('./middleware/auth/authenticate');
+const authenticate = require('./middleware/auth/authenticate');
 const sequelize = require('./config/postgreSQL/server');
 
 require('dotenv').config();
@@ -11,7 +11,7 @@ const config = require('./config/config')[env];
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(auth);
+app.use(authenticate);
 
 // import routs
 const admin = require('./routes/admin.routes');

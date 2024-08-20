@@ -12,6 +12,17 @@ const field_validator = {
         return 1;
     },
 
+    check_empty_number: async (field, param, fieldName) => {
+        if (!field) {
+          return {
+            field: param,
+            message: `${fieldName} field is empty!`,
+          }
+        }
+
+        return 1;
+    },
+
     check_email: async (email, param) => {
         const emailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
   
