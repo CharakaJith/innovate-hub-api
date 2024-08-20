@@ -13,13 +13,15 @@ app.use(cors());
 app.use(express.json());
 app.use(auth);
 
-// Import routs
+// import routs
+const admin = require('./routes/admin.routes');
 const user = require('./routes/user.routes');
 
-// Setup routing paths
+// setup routing paths
+app.use('/api/admin', admin);
 app.use('/api/user', user);
 
-// Start server 
+// start the server 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`PORT: ${PORT} | MODE: ${env}`);

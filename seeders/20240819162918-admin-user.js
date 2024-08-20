@@ -13,7 +13,7 @@ module.exports = {
       userName: process.env.ADMIN_NAME,
       userEmail: process.env.ADMIN_EMAIL,
       userPassword: encryptedPassword,
-      userRole: USER_ROLE.ADMIN,
+      userRole: USER_ROLE.SUPER_ADMIN,
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date()

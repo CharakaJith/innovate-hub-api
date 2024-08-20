@@ -29,6 +29,11 @@ module.exports = {
         allowNull: true,
         type: Sequelize.STRING
       },
+      userAdminId: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+      },
       isActive: {
         allowNull: false,
         type: Sequelize.BOOLEAN

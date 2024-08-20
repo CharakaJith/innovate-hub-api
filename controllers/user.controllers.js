@@ -5,6 +5,7 @@ const jwt_service = require('../util/jwt_service');
 const email_service = require('../util/email_service');
 const UserService = require('../services/user.service');
 const { LOG_TYPE } = require('../enum/log');
+const { USER_ROLE } = require('../enum/user');
 
 const UserController = {
     userLogin: async (req, res) => {
@@ -51,6 +52,8 @@ const UserController = {
                 name: user.userName,
                 email: user.userEmail,
                 role: user.userRole,
+                team: user.userTeam,
+                adminId: user.userAdminId,
                 isActive: user.isActive,
             };
             const accessToken = await jwt_service.generate_access_token(tokenUser);
@@ -94,6 +97,11 @@ const UserController = {
                     error: filteredErrors,
                 });
             } 
+
+            // check admin role
+            if (req.user.role == USER_ROLE.ADMIN && role == USER_ROLE.SUPER_ADMIN) {
+                throw new Error('Permission denied!');
+            }
 
             // check if email exists
             const user = await UserService.findUserByEmail(email);

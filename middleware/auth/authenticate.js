@@ -4,7 +4,12 @@ const { LOG_TYPE } = require('../../enum/log');
 
 const authenticate = async (req, res, next) => {
     try {
-        if (req.path == '/api/user/login') {
+        const unAuthPaths = [
+            '/api/admin',
+            '/api/user/login'
+        ];
+
+        if (unAuthPaths.includes(req.path)) {
             next();
         } else {
             const token = req.headers.authorization;

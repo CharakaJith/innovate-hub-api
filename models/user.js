@@ -34,10 +34,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    userAdminId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-    },
+    },    
   }, {
     sequelize,
     modelName: 'User',
