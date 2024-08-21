@@ -3,58 +3,55 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class Product extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      User.hasMany(models.ProductMember, {
-        foreignKey: 'productMemberId',
+      Product.hasMany(models.ProductCategory, {
+        foreignKey: 'productId',
+        as: 'productCategories',
+      });
+
+      Product.hasMany(models.ProductTag, {
+        foreignKey: 'productId',
+        as: 'productTags',
+      });
+
+      Product.hasMany(models.ProductMember, {
+        foreignKey: 'productId',
         as: 'productMembers',
       });
 
-      User.hasMany(models.Product, {
+      Product.belongsTo(models.User, {
         foreignKey: 'productAdminId',
-        as: 'Products',
+        as: 'user',
       });
     }
   }
-  User.init({
-    userName: {
+  Product.init({
+    productBrand: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    userEmail: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    userPassword: {
+    productDescription: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    userRole: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    userTeam: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    userAdminId: {
+    productAdminId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
+      allowNull: true,
     },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-    },    
+    },
   }, {
     sequelize,
-    modelName: 'User',
-    tableName: 'user'
+    modelName: 'Product',
+    tableName: 'product'
   });
-  return User;
+  return Product;
 };

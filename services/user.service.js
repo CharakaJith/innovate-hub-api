@@ -1,4 +1,5 @@
 const models = require('../models');
+const { Op } = require('sequelize');
 
 const UserService = {
     /**
@@ -30,6 +31,7 @@ const UserService = {
             return await models.User.findOne({
                 where: {
                     id: id,
+                    isActive: true,
                 },
             });
         } catch (error) {
@@ -49,6 +51,9 @@ const UserService = {
                 where: {
                     userAdminId: adminId,
                 },
+                attributes: {
+                    exclude: ['userPassword'], 
+                },        
             });
         } catch (error) {
             throw new Error(`Internal server error while fetching the user by admin id: ${error.message}`);
@@ -59,7 +64,7 @@ const UserService = {
      * Function to create a new record in table "user"
      * 
      * @param {Objects} userDetails: user details object 
-     * @returns a newly created employee object
+     * @returns a newly created user object
      */
     createNewUser: async (userDetails) => {
         try {
@@ -73,7 +78,7 @@ const UserService = {
      * Function to update an existing record in table "user"
      * 
      * @param {Object} userDetails: user details object  
-     * @returns 
+     * @returns an array  with updated users
      */
     updateUserById: async (userDetails) => {
         try {
@@ -85,6 +90,28 @@ const UserService = {
             });
         } catch (error) {
             throw new Error(`Internal server error while updating user by id: ${error.message}`);
+        }
+    },
+
+    /**
+     * Function to fetch a record from table "user" by coulmn 'id' and 'userAdminId'
+     * 
+     * @param {Array} idArray: user id array 
+     * @param {int} adminId: id of the admin
+     * @returns an array of user detail objects if exists, else an empty array
+     */
+    findUsersByIdAndAdminId: async (idArray, adminId) => {
+        try {
+            return await models.User.findAll({
+                where: {
+                    id: {
+                        [Op.in]: idArray
+                    },
+                    userAdminId: adminId
+                }
+            });
+        } catch (error) {
+            throw new Error(`Internal server error while trying to fetch multiple users by id and adminId: ${error.message}`);
         }
     }
 };

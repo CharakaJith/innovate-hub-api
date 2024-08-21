@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authorize = require('../middleware/auth/authorize');
-const UserController = require('../controllers/user.controllers');
+const UserController = require('../controllers/user.controller');
 const { USER_ROLE } = require('../enum/user');
 
 router.get('/', authorize(USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN), UserController.getAllUsers);

@@ -6,17 +6,18 @@ const email_service = require('../util/email_service');
 const UserService = require('../services/user.service');
 const { LOG_TYPE } = require('../enum/log');
 const { USER_ROLE } = require('../enum/user');
+const { MESSAGE } = require('../enum/message');
 
 const UserController = {
     getAllUsers: async (req, res) => {
         try {
-            const admin = await UserService.findUserById(req.user.id);
+            const admin = req.user;
 
             // get users
-            const adminId = admin.userRole == USER_ROLE.SUPER_ADMIN ? admin.id : admin.userAdminId;
+            const adminId = admin.role == USER_ROLE.SUPER_ADMIN ? admin.id : admin.adminId;
             const users = await UserService.findUsersByAdminId(adminId);
 
-            logger(LOG_TYPE.INFO, true, 200, `All users fetched by ${admin.id} | ${admin.userEmail}!`, req);
+            logger(LOG_TYPE.INFO, true, 200, `All users fetched by ${admin.id} | ${admin.email}!`, req);
             return res.status(200).json({
                 success: true,
                 data: users,
@@ -34,23 +35,25 @@ const UserController = {
     getUserById: async (req, res) => {
         try {
             const id = parseInt(req.params.id);
-            const adminId = req.user.id;
+            const admin = req.user;
 
-            const admin = await UserService.findUserById(adminId);
             const user = await UserService.findUserById(id);
 
             // validate user
             if (!user) {
-                throw new Error('Invalid user id!');
+                throw new Error(MESSAGE.INVALID_USER_ID(id));
             }
-            const isDifferentAdmin = (id !== adminId && user.userAdminId !== admin.userAdminId);
-            const isUnauthorizedRole = (admin.userRole === USER_ROLE.MEMBER && [USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN].includes(user.userRole));
+            const isDifferentAdmin = (id !== admin.id && user.userAdminId !== admin.adminId);
+            const isUnauthorizedRole = (admin.role === USER_ROLE.MEMBER && [USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN].includes(user.userRole));
 
             if (isDifferentAdmin || isUnauthorizedRole) {
-                throw new Error('Permission denied!');
+                throw new Error(MESSAGE.PERMISSION_DENIED);
             }
 
-            logger(LOG_TYPE.INFO, true, 200, `User ${user.id} | ${user.userEmail} fetched by ${admin.id} | ${admin.userEmail}!`, req);
+            // remove password hash
+            delete user.dataValues.userPassword;
+
+            logger(LOG_TYPE.INFO, true, 200, `User ${user.id} | ${user.userEmail} fetched by ${admin.id} | ${admin.email}!`, req);
             return res.status(200).json({
                 success: true,
                 data: user,
@@ -89,13 +92,13 @@ const UserController = {
 
             // check admin role
             if (req.user.role == USER_ROLE.ADMIN && role == USER_ROLE.SUPER_ADMIN) {
-                throw new Error('Permission denied!');
+                throw new Error(MESSAGE.PERMISSION_DENIED);
             }
 
             // check if email exists
             const user = await UserService.findUserByEmail(email);
             if (user) {
-                throw new Error(`User ${email} is already invited!`);
+                throw new Error(MESSAGE.USER_ALREADY_INVITED(email));
             }
 
             // create new user
@@ -115,7 +118,7 @@ const UserController = {
             logger(LOG_TYPE.INFO, true, 200, `New user ${newUser.dataValues.id} | ${newUser.dataValues.userEmail} is created!`, req);
             return res.status(200).json({
                 success: true,
-                data: 'User invited!',
+                data: newUser,
             });
         } catch (error) {
             logger(LOG_TYPE.ERROR, false, 500, `Failed to invite the user: ${error.message}`, req);
@@ -150,19 +153,19 @@ const UserController = {
             // validate user
             const user = await UserService.findUserByEmail(email);
             if (!user) {
-                throw new Error('Invalid email or password!');
+                throw new Error(MESSAGE.LOGIN_FAILED);
             }
 
             // validate password and remove it
             const isValidPassword = await bcrypt.compare(password, user.userPassword);
             if (!isValidPassword) {
-                throw new Error('Invalid email or password!');
+                throw new Error(MESSAGE.LOGIN_FAILED);
             }
             delete user.dataValues.userPassword;
 
             // is user active
             if (!user.isActive) {
-                throw new Error('User is inactive!');
+                throw new Error(MESSAGE.USER_INACTIVE(email));
             }
 
             // generate access token
@@ -219,15 +222,15 @@ const UserController = {
             // check if email exists
             const user = await UserService.findUserById(id);
             if (!user) {
-                throw new Error('Invalid user id!');
+                throw new Error(MESSAGE.INVALID_USER_ID(id));
             }
 
             // validate user
             if (user.userEmail != email) {
-                throw new Error('Permission denied!');
+                throw new Error(MESSAGE.PERMISSION_DENIED);
             }
             if (user.isActive) {
-                throw new Error(`User ${email} is already registered!`);
+                throw new Error(MESSAGE.USER_ALREADY_REGISTERED(email));
             }
 
             // hash password
@@ -241,10 +244,13 @@ const UserController = {
             };
             const updatedUser = await UserService.updateUserById(userDetails);
 
+            // remove password hash
+            delete updatedUser[1][0].dataValues.userPassword;
+
             logger(LOG_TYPE.INFO, true, 200, `User ${updatedUser[1][0].dataValues.id} | ${updatedUser[1][0].dataValues.userEmail} is registered!`, req);
             return res.status(200).json({
                 success: true,
-                data: 'User registered!',
+                data: updatedUser[1][0],
             });
         } catch (error) {
             logger(LOG_TYPE.ERROR, false, 500, `Failed to register the user: ${error.message}`, req);
@@ -260,9 +266,8 @@ const UserController = {
         try {
             const id = parseInt(req.params.id);
             const { name, password, role, team } = req.body;
-            const adminId = req.user.id;
+            const admin = req.user;
 
-            const admin = await UserService.findUserById(adminId);
             const user = await UserService.findUserById(id);
 
             // validate user inputs
@@ -284,13 +289,13 @@ const UserController = {
 
             // validate user
             if (!user) {
-                throw new Error('Invalid user id!');
+                throw new Error(MESSAGE.INVALID_USER_ID(id));
             }
-            const isDifferentAdmin = (id !== adminId && user.userAdminId !== admin.userAdminId);
-            const isUnauthorizedRole = (admin.userRole === USER_ROLE.MEMBER && [USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN].includes(user.userRole));
+            const isDifferentAdmin = (id !== admin.id && user.userAdminId !== admin.adminId);
+            const isUnauthorizedRole = (admin.role === USER_ROLE.MEMBER && [USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN].includes(user.userRole));
 
             if (isDifferentAdmin || isUnauthorizedRole) {
-                throw new Error('Permission denied!');
+                throw new Error(MESSAGE.PERMISSION_DENIED);
             }
 
             // hash user password
@@ -309,10 +314,13 @@ const UserController = {
             };
             const updatedUser = await UserService.updateUserById(userDetails);
 
-            logger(LOG_TYPE.INFO, true, 200, `User ${updatedUser[1][0].dataValues.id} | ${updatedUser[1][0].dataValues.userEmail} is disabled by ${admin.id} | ${admin.userEmail}!`, req);
+            // remove password hash
+            delete updatedUser[1][0].dataValues.userPassword;
+
+            logger(LOG_TYPE.INFO, true, 200, `User ${updatedUser[1][0].dataValues.id} | ${updatedUser[1][0].dataValues.userEmail} is disabled by ${admin.id} | ${admin.email}!`, req);
             return res.status(200).json({
                 success: true,
-                message: updatedUser[1],
+                message: updatedUser[1][0],
             });
         } catch (error) {
             logger(LOG_TYPE.ERROR, false, 500, `Failed to update the user: ${error.message}`, req);
@@ -328,20 +336,19 @@ const UserController = {
         try {
             const id = parseInt(req.params.id);
             const adminId = req.user.id;
-
-            const admin = await UserService.findUserById(adminId);
-            const user = await UserService.findUserById(id);
+            const admin = req.user;
 
             // validate user
+            const user = await UserService.findUserById(id);
             if (!user) {
-                throw new Error('Invalid user id!');
+                throw new Error(MESSAGE.INVALID_USER_ID(id));
             }
             const isSameUser = (id === adminId);
-            const isDifferentAdminId = (admin.userAdminId !== user.userAdminId);
-            const isUnauthorizedRoleEscalation = (admin.userRole === USER_ROLE.ADMIN && user.userRole === USER_ROLE.SUPER_ADMIN);
+            const isDifferentAdminId = (admin.adminId !== user.userAdminId);
+            const isUnauthorizedRoleEscalation = (admin.role === USER_ROLE.ADMIN && user.userRole === USER_ROLE.SUPER_ADMIN);
 
             if (isSameUser || isDifferentAdminId || isUnauthorizedRoleEscalation) {
-                throw new Error('Permission denied!');
+                throw new Error(MESSAGE.PERMISSION_DENIED);
             }
 
             // disable user
@@ -351,7 +358,7 @@ const UserController = {
             };
             const updatedUser = await UserService.updateUserById(userDetails);
 
-            logger(LOG_TYPE.INFO, true, 200, `User ${updatedUser[1][0].dataValues.id} | ${updatedUser[1][0].dataValues.userEmail} is disabled by ${admin.id} | ${admin.userEmail}!`, req);
+            logger(LOG_TYPE.INFO, true, 200, `User ${updatedUser[1][0].dataValues.id} | ${updatedUser[1][0].dataValues.userEmail} is disabled by ${admin.id} | ${admin.email}!`, req);
             return res.status(200).json({
                 success: true,
                 data: 'User disabled!',

@@ -5,6 +5,7 @@ const jwt_service = require('../util/jwt_service');
 const UserService = require('../services/user.service');
 const { USER_ROLE } = require('../enum/user');
 const { LOG_TYPE } = require('../enum/log');
+const { MESSAGE } = require('../enum/message');
 
 const AdminController = {
     adminSignUp: async (req, res) => {
@@ -31,7 +32,7 @@ const AdminController = {
             // check if email exists
             const user = await UserService.findUserByEmail(email);
             if (user) {
-                throw new Error(`Admin ${email} is already registered!`);
+                throw new Error(MESSAGE.ADMIN_ALREADY_REGISTERED(email));
             }
 
             // hash password
@@ -57,6 +58,8 @@ const AdminController = {
             };
             const accessToken = await jwt_service.generate_access_token(tokenUser);
 
+            // remove password hash
+            delete newAdmin.dataValues.userPassword;
 
             logger(LOG_TYPE.INFO, true, 200, `Admin ${newAdmin.dataValues.id} | ${newAdmin.dataValues.userEmail} signed in!`, req)
             res.set({
@@ -64,10 +67,10 @@ const AdminController = {
             });
             return res.status(200).json({
                 success: true,
-                message: 'Sign up successful!',
+                message: newAdmin,
             });
         } catch (error) {
-            logger(LOG_TYPE.ERROR, false, 500, error.message, req);
+            logger(LOG_TYPE.ERROR, false, 500, `Failed to signup admin: ${error.message}`, req);
 
             return res.status(500).json({
                 success: false,

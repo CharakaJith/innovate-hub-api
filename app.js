@@ -16,10 +16,12 @@ app.use(authenticate);
 // import routs
 const admin = require('./routes/admin.routes');
 const user = require('./routes/user.routes');
+const product = require('./routes/product.routes');
 
 // setup routing paths
 app.use('/api/admin', admin);
 app.use('/api/user', user);
+app.use('/api/product', product);
 
 // start the server 
 const PORT = process.env.PORT || 3000;
