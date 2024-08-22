@@ -13,6 +13,7 @@ const UserService = {
             return await models.User.findOne({
                 where: {
                     userEmail: email,
+                    isActive: true,
                 },
             });
         } catch (error) {

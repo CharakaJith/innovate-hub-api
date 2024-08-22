@@ -43,7 +43,7 @@ const ProductController = {
                 for (const invalidId of invalidIds) {
                     errorArray.push({
                         field: "members",
-                        message: `Invalid member id ${invalidId}!`,
+                        message: MESSAGE.INVALID_USER_ID(invalidId),
                     });
                 }
             }
@@ -223,7 +223,7 @@ const ProductController = {
                 for (const invalidId of invalidIds) {
                     errorArray.push({
                         field: "members",
-                        message: `Invalid member id ${invalidId}!`,
+                        message: MESSAGE.INVALID_USER_ID(invalidId),
                     });
                 }
             }
@@ -335,7 +335,7 @@ const ProductController = {
             logger(LOG_TYPE.INFO, true, 200, `Product ${product.id} | ${product.productBrand} is disabled by ${admin.id} | ${admin.email}!`, req);
             return res.status(200).json({
                 success: true,
-                message: 'User disabled!',
+                message: MESSAGE.USER_DISABLED,
             });
         } catch (error) {
             logger(LOG_TYPE.ERROR, false, 500, `Failed to disable the product: ${error.message}`, req);

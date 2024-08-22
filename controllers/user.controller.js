@@ -17,10 +17,16 @@ const UserController = {
             const adminId = admin.role == USER_ROLE.SUPER_ADMIN ? admin.id : admin.adminId;
             const users = await UserService.findUsersByAdminId(adminId);
 
+            const activeUsers = users.filter(user => user.isActive);
+            const inactiveUsers = users.filter(user => !user.isActive);
+
             logger(LOG_TYPE.INFO, true, 200, `All users fetched by ${admin.id} | ${admin.email}!`, req);
             return res.status(200).json({
                 success: true,
-                data: users,
+                data: {
+                    activeUsers,
+                    inactiveUsers,
+                },
             });
         } catch (error) {
             logger(LOG_TYPE.ERROR, false, 500, `Failed to get all users: ${error.message}`, req);

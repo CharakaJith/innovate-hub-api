@@ -1,11 +1,12 @@
 const { USER_ROLE, USER_TEAM } = require('../enum/user');
+const { MESSAGE } = require('../enum/message');
 
 const field_validator = {
     check_empty_string: async (field, param, fieldName) => {
         if (!field || field.trim().length === 0) {
           return {
             field: param,
-            message: `${fieldName} field is empty!`,
+            message: MESSAGE.EMPTY_FIELD(fieldName),
           }
         }
   
@@ -16,7 +17,7 @@ const field_validator = {
         if (!field) {
           return {
             field: param,
-            message: `${fieldName} field is empty!`,
+            message: MESSAGE.EMPTY_FIELD(fieldName),
           }
         }
 
@@ -31,7 +32,7 @@ const field_validator = {
         if (isValidEmail != 1 || !String(email).match(emailformat)) {
           return {
             field: param,
-            message: `Invalid email address!`,
+            message: MESSAGE.INVALID_EMAIL,
           }
         }
   
@@ -44,7 +45,7 @@ const field_validator = {
       if (isValidRole != 1 || !Object.values(USER_ROLE).includes(role)) {
         return {
           field: param,
-          message: `Invalid user role!`,
+          message: MESSAGE.INVALID_ROLE,
         }
       }
 
@@ -57,7 +58,22 @@ const field_validator = {
       if (isValidTeam != 1 || !Object.values(USER_TEAM).includes(team)) {
         return {
           field: param,
-          message: `Invalid user team!`,
+          message: MESSAGE.INVALID_TEAM,
+        }
+      }
+
+      return 1;
+    },
+
+    check_date: async (date, param) => {
+      const isValidDate = await field_validator.check_empty_string(date, param, 'Meeting time');
+
+      const dateTime = new Date(date);
+
+      if (isValidDate != 1 || isNaN(dateTime.getTime())) {
+        return {
+          field: param,
+          message: MESSAGE.INVALID_MEETING,
         }
       }
 

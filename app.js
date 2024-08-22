@@ -17,11 +17,15 @@ app.use(authenticate);
 const admin = require('./routes/admin.routes');
 const user = require('./routes/user.routes');
 const product = require('./routes/product.routes');
+const team = require('./routes/team.routes');
+const meeting = require('./routes/meeting.routes');
 
 // setup routing paths
 app.use('/api/admin', admin);
 app.use('/api/user', user);
 app.use('/api/product', product);
+app.use('/api/team', team);
+app.use('/api/meeting', meeting);
 
 // start the server 
 const PORT = process.env.PORT || 3000;

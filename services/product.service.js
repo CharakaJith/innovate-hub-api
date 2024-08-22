@@ -109,13 +109,19 @@ const ProductService = {
         }
     },
 
+    /**
+     * Function to update a record in table "product" by column 'id'
+     * 
+     * @param {Object} productDetails: product detail object 
+     * @returns an array of updated product details, else an empty array
+     */
     updateProductById: async (productDetails) => {
         try {
             return await models.Product.update(productDetails, {
                 where: {
                     id: productDetails.id,
                 },
-                returning: true
+                returning: true,
             });
         } catch (error) {
             throw new Error(`Internal server error while updating a product by id: ${error.message}`);
