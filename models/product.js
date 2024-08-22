@@ -25,6 +25,11 @@ module.exports = (sequelize, DataTypes) => {
         as: 'productMembers',
       });
 
+      Product.hasMany(models.Meeting, {
+        foreignKey: 'meetingProductId',
+        as: 'productMeetings',
+      });
+
       Product.belongsTo(models.User, {
         foreignKey: 'productAdminId',
         as: 'user',

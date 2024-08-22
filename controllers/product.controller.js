@@ -127,9 +127,11 @@ const ProductController = {
         try {
             const admin = req.user;
 
+            // get products
             const adminId = admin.role == USER_ROLE.SUPER_ADMIN ? admin.id : admin.adminId;
             let products = await ProductService.findAllProductsByAdminId(adminId);
 
+            // check request user accesibility
             const userProducts = [];
             if (admin.role == USER_ROLE.MEMBER) {
                 for (const product of products) {
@@ -140,7 +142,6 @@ const ProductController = {
                     }
                 }
             }
-
             products = userProducts.length != 0 ? userProducts : products;
 
             logger(LOG_TYPE.INFO, true, 200, `All products fetched by ${admin.id} | ${admin.email}!`, req);
@@ -163,6 +164,7 @@ const ProductController = {
             const id = parseInt(req.params.id);
             const admin = req.user;
 
+            // validate product
             const product = await ProductService.findProductById(id);
             if (!product) {
                 throw new Error(MESSAGE.INVALID_PRODUCT_ID(id));
@@ -173,7 +175,6 @@ const ProductController = {
             if (admin.role == USER_ROLE.MEMBER)  {
                 isAccessible = product.productMembers.some(member => member.productMemberId === admin.id);
             }
-            // const isAccessible = admin.role === USER_ROLE.MEMBER ? product.productMembers.some(member => member.productMemberId === admin.id) : false;
             if (!isAccessible) {
                 throw new Error(MESSAGE.PERMISSION_DENIED);
             }
@@ -321,6 +322,7 @@ const ProductController = {
                 throw new Error(MESSAGE.INVALID_PRODUCT_ID(id));
             }
 
+            // check request user accessibility
             if (admin.id != product.productAdminId && admin.adminId != product.productAdminId) {
                 throw new Error(MESSAGE.PERMISSION_DENIED);
             }

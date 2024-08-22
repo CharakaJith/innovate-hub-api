@@ -11,6 +11,7 @@ const MeetingController = {
         try {
             const admin = req.user;
 
+            // get meetings and associated product
             const adminId = admin.role == USER_ROLE.SUPER_ADMIN ? admin.id : admin.adminId;
             const meetings = await MeetingService.findMeetingByAdminId(adminId);
             let products = await ProductService.findAllProductsByAdminId(adminId);
@@ -28,6 +29,7 @@ const MeetingController = {
             }
             products = userProducts.length != 0 ? userProducts : products;
 
+            // categorize meetings with their product
             const meetingWithProduct = await Promise.all(meetings.map(async (meeting) => {
                 const product = products.find(product => product.id === meeting.meetingProductId);
             
@@ -149,6 +151,7 @@ const MeetingController = {
             };
             const newMeeting = await MeetingService.createNewMeeting(meetingDetails);
 
+            // get meeting due
             const meetingIn = await getTimeDifference(newMeeting.meetingTime);
 
             logger(LOG_TYPE.INFO, true, 200, `New meeting ${newMeeting.id} scheduled by ${admin.id} | ${admin.email}!`, req);
@@ -222,6 +225,7 @@ const MeetingController = {
             };
             const updatedMeeting = await MeetingService.updateMeeting(meetingDetails);
 
+            // get meeting due
             const meetingIn = await getTimeDifference(updatedMeeting[1][0].meetingTime);
 
             logger(LOG_TYPE.INFO, true, 200, `Meeting ${id} updated by ${admin.id} | ${admin.email}!`, req);
@@ -247,6 +251,7 @@ const MeetingController = {
             const id = parseInt(req.params.id);
             const admin = req.user;
 
+            // validate meeting 
             const adminId = admin.role == USER_ROLE.SUPER_ADMIN ? admin.id : admin.adminId;
             const meeting = await MeetingService.findMeetingById(id, adminId);
             if (!meeting) {

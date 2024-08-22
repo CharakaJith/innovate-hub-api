@@ -9,11 +9,14 @@ const TeamController = {
         try {
             const admin = req.user;
 
+            // get users
             const adminId = admin.role == USER_ROLE.SUPER_ADMIN ? admin.id : admin.adminId;
             const users = await UserService.findUsersByAdminId(adminId);
 
+            // select active users
             const activeUsers = users.filter(user => user.isActive);
 
+            // differentiate users into teams
             const usersByTeam = activeUsers.reduce((acc, user) => {
                 if (!acc[user.userTeam]) {
                     acc[user.userTeam] = []; 
@@ -58,9 +61,11 @@ const TeamController = {
                 });
             }
 
+            // get users
             const adminId = admin.role == USER_ROLE.SUPER_ADMIN ? admin.id : admin.adminId;
             const users = await UserService.findUsersByAdminId(adminId);
 
+            // select active users
             const activeUsers = users.filter(user => user.isActive);
             const userTeam = activeUsers.filter(user => user.userTeam == team);
 
