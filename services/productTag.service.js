@@ -10,18 +10,11 @@ const ProductTagService = {
      * @returns an array of newly created product tags
      */
     createTags: async (tags) => {
-        const transaction = await sequelize.transaction(); 
-
         try {
-            const createdTags = await models.ProductTag.bulkCreate(tags, {
+            return await models.ProductTag.bulkCreate(tags, {
                 ignoreDuplicates: true,
-                transaction 
             });
-
-            await transaction.commit(); 
-            return createdTags;
         } catch (error) {
-            await transaction.rollback(); 
             throw new Error(`Internal server error while creating product tags: ${error.message}`);
         }
     },

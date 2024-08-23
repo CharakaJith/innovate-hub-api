@@ -9,15 +9,9 @@ const ProductService = {
      * @returns a newly created product object
      */
     createNewProduct: async (productDetails) => {
-        const transaction = await sequelize.transaction(); 
-
         try {
-            const newProduct = await models.Product.create(productDetails, { transaction });
-
-            await transaction.commit(); 
-            return newProduct;
+            return await models.Product.create(productDetails);
         } catch (error) {
-            await transaction.rollback(); 
             throw new Error(`Internal server error while creating a new product: ${error.message}`);
         }
     },

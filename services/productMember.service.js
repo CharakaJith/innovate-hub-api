@@ -9,18 +9,12 @@ const ProductMemberService = {
      * @returns an array of newly created product members
      */
     createMembers: async (members) => {
-        const transaction = await sequelize.transaction(); 
 
         try {
-            const createdMembers = await models.ProductMember.bulkCreate(members, {
-                ignoreDuplicates: true,
-                transaction 
+            return await models.ProductMember.bulkCreate(members, {
+                ignoreDuplicates: true, 
             });
-
-            await transaction.commit(); 
-            return createdMembers;
         } catch (error) {
-            await transaction.rollback(); 
             throw new Error(`Internal server error while creating product members: ${error.message}`);
         }
     },

@@ -9,18 +9,11 @@ const ProductCategoryService = {
      * @returns an array of newly created product categories
      */
     createCategories: async (categories) => {
-        const transaction = await sequelize.transaction(); 
-
         try {
-            const createdCategories = await models.ProductCategory.bulkCreate(categories, {
+            return models.ProductCategory.bulkCreate(categories, {
                 ignoreDuplicates: true,
-                transaction 
             });
-
-            await transaction.commit(); 
-            return createdCategories;
         } catch (error) {
-            await transaction.rollback(); rs
             throw new Error(`Internal server error while creating product categories: ${error.message}`);
         }
     },

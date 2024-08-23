@@ -2,7 +2,7 @@ const models = require('../models');
 
 const MeetingService = {
     /**
-     * Functions to create a new record in "Meeting"
+     * Functions to create a new record in "meeting"
      * 
      * @param {Object} meetingDetails: meeting details object 
      * @returns a newly created meeting object
