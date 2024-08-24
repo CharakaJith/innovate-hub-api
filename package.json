@@ -4,12 +4,13 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev": "env-cmd -f .env.dev nodemon app.js",
-    "migrate:up": "env-cmd -f .env.dev npx sequelize-cli db:migrate",
-    "migrate:down": "env-cmd -f .env.dev npx sequelize-cli db:migrate:undo",
-    "migrate:down:all": "env-cmd -f .env.dev npx sequelize-cli db:migrate:undo:all",
-    "seed:up:all": "env-cmd -f .env.dev npx sequelize-cli db:seed:all",
-    "seed:down:all": "env-cmd -f .env.dev npx sequelize-cli db:seed:undo",
+    "start": "env-cmd -f .env node app.js",
+    "dev": "env-cmd -f .env nodemon app.js",    
+    "migrate:up": "env-cmd -f .env npx sequelize-cli db:migrate",
+    "migrate:down": "env-cmd -f .env npx sequelize-cli db:migrate:undo",
+    "migrate:down:all": "env-cmd -f .env npx sequelize-cli db:migrate:undo:all",
+    "seed:up:all": "env-cmd -f .env npx sequelize-cli db:seed:all",
+    "seed:down:all": "env-cmd -f .env npx sequelize-cli db:seed:undo",
     "test": "mocha"
   },
   "repository": {

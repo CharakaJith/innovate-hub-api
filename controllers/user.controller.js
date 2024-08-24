@@ -51,9 +51,7 @@ const UserController = {
             }
 
             // check request user accessibility
-            const isDifferentAdmin = (id !== admin.id && user.userAdminId !== admin.adminId);
-            const isUnauthorizedRole = (admin.role === USER_ROLE.MEMBER && [USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN].includes(user.userRole));
-            if (isDifferentAdmin || isUnauthorizedRole) {
+            if (admin.role == USER_ROLE.MEMBER && admin.id != user.id) {
                 throw new Error(MESSAGE.PERMISSION_DENIED);
             }
 
@@ -78,6 +76,7 @@ const UserController = {
     inviteUser: async (req, res) => {
         try {
             const { name, email , role, team } = req.body;
+            const admin = req.user;
 
             // validate user inputs
             const errorArray = [];
@@ -98,7 +97,7 @@ const UserController = {
             } 
 
             // check admin role
-            if (req.user.role == USER_ROLE.ADMIN && role == USER_ROLE.SUPER_ADMIN) {
+            if (role == USER_ROLE.SUPER_ADMIN) {
                 throw new Error(MESSAGE.PERMISSION_DENIED);
             }
 
@@ -114,13 +113,13 @@ const UserController = {
                 userEmail: email,
                 userRole: role,
                 userTeam: team,
-                userAdminId: req.user.role == USER_ROLE.SUPER_ADMIN ? req.user.id : req.user.adminId,
+                userAdminId: admin.role == USER_ROLE.SUPER_ADMIN ? admin.id : admin.adminId,
                 isActive: false,
             };
             const newUser = await UserService.createNewUser(userDetails);
 
             // send user invitation email
-            // await email_service.send_user_invitation(newUser.userEmail, req.user.name);
+            // await email_service.send_user_invitation(newUser.userEmail, admin.name);
 
             logger(LOG_TYPE.INFO, true, 200, `New user ${newUser.dataValues.id} | ${newUser.dataValues.userEmail} is created!`, req);
             return res.status(200).json({
@@ -299,9 +298,7 @@ const UserController = {
             }
 
             // check request user accesibility
-            const isDifferentAdmin = (id !== admin.id && user.userAdminId !== admin.adminId);
-            const isUnauthorizedRole = (admin.role === USER_ROLE.MEMBER && [USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN].includes(user.userRole));
-            if (isDifferentAdmin || isUnauthorizedRole) {
+            if (admin.role == USER_ROLE.MEMBER && admin.id != user.id) {
                 throw new Error(MESSAGE.PERMISSION_DENIED);
             }
 
@@ -342,7 +339,6 @@ const UserController = {
     disableUser: async (req, res) => {
         try {
             const id = parseInt(req.params.id);
-            const adminId = req.user.id;
             const admin = req.user;
 
             // validate user
@@ -351,11 +347,8 @@ const UserController = {
                 throw new Error(MESSAGE.INVALID_USER_ID(id));
             }
 
-            // check user accesibility
-            const isSameUser = (id === adminId);
-            const isDifferentAdminId = (admin.adminId !== user.userAdminId);
-            const isUnauthorizedRoleEscalation = (admin.role === USER_ROLE.ADMIN && user.userRole === USER_ROLE.SUPER_ADMIN);
-            if (isSameUser || isDifferentAdminId || isUnauthorizedRoleEscalation) {
+            // check request user accesibility
+            if ((admin.id != user.userAdminId && admin.adminId != user.userAdminId) || (id == admin.id)) {
                 throw new Error(MESSAGE.PERMISSION_DENIED);
             }
 

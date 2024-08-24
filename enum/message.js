@@ -16,6 +16,7 @@ module.exports = {
         USER_INACTIVE: (email) => `User ${email} is inactive!`,                
         USER_ALREADY_REGISTERED: (email) => `User ${email} is already registered!`,
 
+        PRODUCT_DISABLED: 'Product disabled!',
         BRAND_ALREADY_SAVED: (brand) => `Brand ${brand} is already saved as a product!`,
         INVALID_PRODUCT_ID: (id) => `Invalid product id ${id}!`,
 

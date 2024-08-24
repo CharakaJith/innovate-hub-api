@@ -13,7 +13,6 @@ const UserService = {
             return await models.User.findOne({
                 where: {
                     userEmail: email,
-                    isActive: true,
                 },
             });
         } catch (error) {
@@ -32,7 +31,6 @@ const UserService = {
             return await models.User.findOne({
                 where: {
                     id: id,
-                    isActive: true,
                 },
             });
         } catch (error) {
