@@ -31,7 +31,7 @@ innovate-hub-api is designed to be efficient, scalable, and secure, providing a 
    ```
 4.  Enter following content in the `.env` file in the server
     ```bash
-   # environment variables
+    # environment variables
     NODE_ENV=development
     PORT=8000
 
