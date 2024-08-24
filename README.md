@@ -53,7 +53,7 @@ innovate-hub-api is designed to be efficient, scalable, and secure, providing a 
     # mailgun credentials
     DOMAIN=<MAILGUN_DOMAIN>
     API_KEY=<MAILGUN_API_KEY>
-   ```
+    ```
 
 ### Database setup
 
